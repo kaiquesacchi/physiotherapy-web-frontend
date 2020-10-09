@@ -1,11 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './pages';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./pages";
+
+import { SnackBar } from "./components/SnackBar";
 
 ReactDOM.render(
-  <React.StrictMode>
+  <SnackBar>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </SnackBar>,
+  document.getElementById("root")
 );
