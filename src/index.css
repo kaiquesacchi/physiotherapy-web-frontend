@@ -61,7 +61,7 @@
   src: local("Lato"), url(./fonts/Lato/Lato-BlackItalic.ttf) format("truetype");
 }
 
-body {
+* {
   margin: 0;
   font-family: "Lato", "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
