@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const SCButton = styled(ButtonMD)`
   width: 100%;
-  margin: 20px 0;
+  margin: 20px 0 0;
 `;
 
 export default function Button({ children, ...rest }: any) {

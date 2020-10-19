@@ -11,6 +11,7 @@ export const mdTheme = createMuiTheme({
     palette: {
       primary: {
         main: theme.primary,
+        contrastText: "#FFFFFF"
       },
       secondary: {
         main: theme.secondary,

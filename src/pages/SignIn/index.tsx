@@ -10,8 +10,7 @@ const Greeting = styled.p`
   font-size: 36px;
   color: ${(props) => props.theme.secondary};
   text-align: center;
-  margin-top: 50px;
-  margin-bottom: 100px;
+  width: 60%;
 `;
 
 const SCForm = styled.form`
@@ -25,6 +24,7 @@ const SCLink = styled.a`
   color: ${(props) => props.theme.secondary};
   font-weight: bold;
 `;
+
 export default function SignIn() {
   return (
     <Page centralize>

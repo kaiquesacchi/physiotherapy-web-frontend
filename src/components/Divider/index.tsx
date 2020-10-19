@@ -14,6 +14,7 @@ const SCDivider = styled.div`
   column-gap: 10px;
   align-items: center;
   width: 100%;
+  margin-top: 20px;
 `;
 
 export default function Divider(props: any) {

@@ -41,8 +41,9 @@ const SCLeftArea = styled.div`
 const SCRightArea = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 50px 0 20px;
 `;
 
 interface iProps {
@@ -55,7 +56,7 @@ export default function AuthCard({ children }: iProps) {
         <p>
           Uma forma mais <span>divertida</span> de se cuidar
         </p>
-        <img src={imageSmilingMedic}></img>
+        <img src={imageSmilingMedic} alt="Ilustração decorativa. Médica sorrindo."></img>
       </SCLeftArea>
       <SCRightArea>{children}</SCRightArea>
     </SCAuthCard>
