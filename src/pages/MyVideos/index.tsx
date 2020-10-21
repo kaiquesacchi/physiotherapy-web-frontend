@@ -10,6 +10,7 @@ import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
 
 import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
+import InviteCard from "../../components/InviteCard";
 
 const SCContent = styled.div`
   padding: 20px 50px;
@@ -62,6 +63,7 @@ export default function MyVideos() {
         <VideoPlayerCard />
       </Dialog>
       <SCContent>
+        <InviteCard />
         <div>
           <SCDateTitle>02/08/2020</SCDateTitle>
           <SCVideoList>
