@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
 
@@ -7,6 +7,9 @@ import PlayCircleFilledWhiteTwoToneIcon from "@material-ui/icons/PlayCircleFille
 
 // Will be removed
 import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
+
+import { Dialog } from "@material-ui/core";
+import VideoPlayerCard from "../../components/VideoPlayerCard";
 
 const SCContent = styled.div`
   padding: 20px 50px;
@@ -49,15 +52,25 @@ const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTwoToneIc
 `;
 
 export default function MyVideos() {
+  const [open, setOpen] = useState(false);
+  const handleOpenPlayer = () => setOpen(true);
+  const handleClosePlayer = () => setOpen(false);
   return (
     <Page>
       <AppBar />
+      <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
+        <VideoPlayerCard />
+      </Dialog>
       <SCContent>
         <div>
           <SCDateTitle>02/08/2020</SCDateTitle>
           <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand}></img>
+            <SCVideoBlock onClick={handleOpenPlayer}>
+              <img src={imageClosedHand} alt=""></img>
+              <SCPlayCircleFilledWhiteTwoToneIcon />
+            </SCVideoBlock>
+            <SCVideoBlock onClick={handleOpenPlayer}>
+              <img src={imageClosedHand} alt=""></img>
               <SCPlayCircleFilledWhiteTwoToneIcon />
             </SCVideoBlock>
           </SCVideoList>
@@ -66,7 +79,7 @@ export default function MyVideos() {
           <SCDateTitle>01/08/2020</SCDateTitle>
           <SCVideoList>
             <SCVideoBlock>
-              <img src={imageClosedHand}></img>
+              <img src={imageClosedHand} alt=""></img>
               <SCPlayCircleFilledWhiteTwoToneIcon />
             </SCVideoBlock>
           </SCVideoList>
@@ -75,7 +88,7 @@ export default function MyVideos() {
           <SCDateTitle>25/07/2020</SCDateTitle>
           <SCVideoList>
             <SCVideoBlock>
-              <img src={imageClosedHand}></img>
+              <img src={imageClosedHand} alt=""></img>
               <SCPlayCircleFilledWhiteTwoToneIcon />
             </SCVideoBlock>
           </SCVideoList>
@@ -84,7 +97,7 @@ export default function MyVideos() {
           <SCDateTitle>22/05/2020</SCDateTitle>
           <SCVideoList>
             <SCVideoBlock>
-              <img src={imageClosedHand}></img>
+              <img src={imageClosedHand} alt=""></img>
               <SCPlayCircleFilledWhiteTwoToneIcon />
             </SCVideoBlock>
           </SCVideoList>
