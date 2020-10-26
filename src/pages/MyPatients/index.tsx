@@ -12,6 +12,8 @@ import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
 import Select from "../../components/inputs/Select";
 import Button from "../../components/inputs/Button";
+import Slider from "../../components/inputs/Slider";
+import TimeField from "../../components/inputs/TimeField";
 
 const SCContent = styled.div`
   padding: 20px 50px;
@@ -82,12 +84,75 @@ const patients = [
   },
 ];
 
-export default function PatientVideos() {
+export default function MyPatients() {
   const [open, setOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [patientID, setPatientID] = useState(0);
   const handleOpenPlayer = () => setOpen(true);
   const handleClosePlayer = () => setOpen(false);
+
+  const videoTab = (
+    <SCContent>
+      <div>
+        <SCDateTitle>02/08/2020</SCDateTitle>
+        <SCVideoList>
+          <SCVideoBlock onClick={handleOpenPlayer}>
+            <img src={imageClosedHand} alt=""></img>
+            <SCPlayCircleFilledWhiteTwoToneIcon />
+          </SCVideoBlock>
+          <SCVideoBlock onClick={handleOpenPlayer}>
+            <img src={imageClosedHand} alt=""></img>
+            <SCPlayCircleFilledWhiteTwoToneIcon />
+          </SCVideoBlock>
+        </SCVideoList>
+      </div>
+      <div>
+        <SCDateTitle>01/08/2020</SCDateTitle>
+        <SCVideoList>
+          <SCVideoBlock>
+            <img src={imageClosedHand} alt=""></img>
+            <SCPlayCircleFilledWhiteTwoToneIcon />
+          </SCVideoBlock>
+        </SCVideoList>
+      </div>
+      <div>
+        <SCDateTitle>25/07/2020</SCDateTitle>
+        <SCVideoList>
+          <SCVideoBlock>
+            <img src={imageClosedHand} alt=""></img>
+            <SCPlayCircleFilledWhiteTwoToneIcon />
+          </SCVideoBlock>
+        </SCVideoList>
+      </div>
+      <div>
+        <SCDateTitle>22/05/2020</SCDateTitle>
+        <SCVideoList>
+          <SCVideoBlock>
+            <img src={imageClosedHand} alt=""></img>
+            <SCPlayCircleFilledWhiteTwoToneIcon />
+          </SCVideoBlock>
+        </SCVideoList>
+      </div>
+    </SCContent>
+  );
+
+  const parametersTab = (
+    <SCContent>
+      <div>
+        <SCDateTitle>Limiar de Detecção</SCDateTitle>
+        <Slider />
+      </div>
+      <div>
+        <SCDateTitle>Tempo Máximo por Sessão</SCDateTitle>
+        <TimeField />
+      </div>
+      <div>
+        <SCDateTitle>Intervalo Mínimo entre Sessões</SCDateTitle>
+        <TimeField />
+      </div>
+    </SCContent>
+  );
+
   return (
     <Page>
       <AppBar tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
@@ -99,48 +164,7 @@ export default function PatientVideos() {
       <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
         <VideoPlayerCard />
       </Dialog>
-      <SCContent>
-        <div>
-          <SCDateTitle>02/08/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock onClick={handleOpenPlayer}>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-            <SCVideoBlock onClick={handleOpenPlayer}>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>01/08/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>25/07/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>22/05/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-      </SCContent>
+      {selectedTab === 0 ? videoTab : parametersTab}
     </Page>
   );
 }
