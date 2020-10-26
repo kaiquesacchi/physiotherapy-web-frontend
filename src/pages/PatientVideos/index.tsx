@@ -10,7 +10,8 @@ import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
 
 import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
-import InviteCard from "../../components/InviteCard";
+import Select from "../../components/inputs/Select";
+import Button from "../../components/inputs/Button";
 
 const SCContent = styled.div`
   padding: 20px 50px;
@@ -52,20 +53,53 @@ const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTwoToneIc
   top: calc(100px - 30px);
 `;
 
-export default function MyVideos() {
+const SCPatientSelectionArea = styled.div`
+  width: 60%;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 20px;
+  padding: 10px 0;
+  box-sizing: content-box;
+  button {
+    align-self: center;
+    margin: 0;
+  }
+`;
+
+// Will be removed
+const patients = [
+  {
+    label: "Rogério Silva",
+    value: 0,
+  },
+  {
+    label: "Cláudia Santos",
+    value: 1,
+  },
+  {
+    label: "Fabio Lima",
+    value: 2,
+  },
+];
+
+export default function PatientVideos() {
   const [open, setOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [patientID, setPatientID] = useState(0);
   const handleOpenPlayer = () => setOpen(true);
   const handleClosePlayer = () => setOpen(false);
   return (
     <Page>
-      <AppBar>
-        <h1>Meus Vídeos</h1>
+      <AppBar tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
+        <SCPatientSelectionArea>
+          <Select label="Paciente" options={patients} selectedValue={patientID} setSelectedValue={setPatientID} />
+          <Button color="secondary">Adicionar Paciente</Button>
+        </SCPatientSelectionArea>
       </AppBar>
       <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
         <VideoPlayerCard />
       </Dialog>
       <SCContent>
-        <InviteCard />
         <div>
           <SCDateTitle>02/08/2020</SCDateTitle>
           <SCVideoList>

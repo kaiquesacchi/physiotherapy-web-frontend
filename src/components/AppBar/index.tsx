@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import AppBarMD from "@material-ui/core/AppBar";
-import { IconButton, Menu, MenuItem, Toolbar } from "@material-ui/core";
+import { IconButton, Menu, MenuItem, Tab, Tabs, Toolbar } from "@material-ui/core";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import styled from "styled-components";
 
@@ -9,7 +9,18 @@ const SCToolbar = styled(Toolbar)`
   justify-content: space-between;
 `;
 
-export default function AppBar() {
+const SCTabs = styled(Tabs)`
+  background-color: #6cb087;
+`;
+
+interface iProps {
+  tabs?: boolean;
+  selectedTab?: number;
+  setSelectedTab?: Dispatch<SetStateAction<any>>;
+  children: React.ReactNode;
+}
+
+export default function AppBar({ tabs, selectedTab, setSelectedTab, children }: iProps) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -18,10 +29,14 @@ export default function AppBar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleChange = (_event: React.ChangeEvent<{}>, selectedValue: number) => {
+    if (setSelectedTab) setSelectedTab(selectedValue);
+  };
+
   return (
-    <AppBarMD position="static">
+    <AppBarMD position="sticky" style={{ width: "100vw", boxSizing: "content-box" }}>
       <SCToolbar>
-        <h1>Meus Vídeos</h1>
+        {children}
         <div>
           <IconButton
             aria-label="account of current user"
@@ -50,6 +65,14 @@ export default function AppBar() {
           </Menu>
         </div>
       </SCToolbar>
+      {tabs ? (
+        <SCTabs value={selectedTab} onChange={handleChange}>
+          <Tab label="Vídeos" />
+          <Tab label="Parâmetros" />
+        </SCTabs>
+      ) : (
+        ""
+      )}
     </AppBarMD>
   );
 }
