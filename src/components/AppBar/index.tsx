@@ -3,6 +3,8 @@ import AppBarMD from "@material-ui/core/AppBar";
 import { IconButton, Menu, MenuItem, Tab, Tabs, Toolbar } from "@material-ui/core";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import styled from "styled-components";
+import AuthService from "../../services/Auth";
+import { useHistory } from "react-router-dom";
 
 const SCToolbar = styled(Toolbar)`
   display: flex;
@@ -25,6 +27,13 @@ export default function AppBar({ tabs, selectedTab, setSelectedTab, children }: 
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+  const history = useHistory();
+
+  const handleSignOut = () => {
+    AuthService.signOut();
+    handleClose();
+    history.push("/sign-in");
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -60,8 +69,7 @@ export default function AppBar({ tabs, selectedTab, setSelectedTab, children }: 
             }}
             open={open}
             onClose={handleClose}>
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleSignOut}>Sair</MenuItem>
           </Menu>
         </div>
       </SCToolbar>

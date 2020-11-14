@@ -4,7 +4,7 @@ import { Snackbar } from "@material-ui/core";
 /*
   Este componente deve ser adicionado como pai do projeto. Ele sempre estará disponível,
   e será visível enquanto `message` não estiver vazia. Para permitir a outros componentes
-  que alterem `message`, o hook useAlert retorna, através do contexto, a função de dispatch
+  que alterem `message`, o hook useSnackBar retorna, através do contexto, a função de dispatch
   que permite alterar o valor da variável. O restante do projeto deve ser passado como 
   `children` para ter acesso ao context.
 */
