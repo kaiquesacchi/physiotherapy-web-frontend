@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
 
@@ -11,6 +11,7 @@ import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
 import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
 import InviteCard from "../../components/InviteCard";
+import LinkController from "../../controllers/Link";
 
 const SCContent = styled.div`
   padding: 20px 50px;
@@ -53,15 +54,25 @@ const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTwoToneIc
 `;
 
 export default function MyVideos() {
-  const [open, setOpen] = useState(false);
-  const handleOpenPlayer = () => setOpen(true);
-  const handleClosePlayer = () => setOpen(false);
+  const [openVideoPlayer, setOpenVideoPlayer] = useState(false);
+  const handleOpenPlayer = () => setOpenVideoPlayer(true);
+  const handleClosePlayer = () => setOpenVideoPlayer(false);
+
+  useEffect(() => {
+    LinkController.getLinkRequests()
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.dir(error);
+      });
+  }, []);
   return (
     <Page>
       <AppBar>
         <h1>Meus Vídeos</h1>
       </AppBar>
-      <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
+      <Dialog onClose={handleClosePlayer} open={openVideoPlayer} maxWidth="xl">
         <VideoPlayerCard />
       </Dialog>
       <SCContent>

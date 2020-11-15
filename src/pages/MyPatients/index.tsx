@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
-
-import styled from "styled-components";
-import PlayCircleFilledWhiteTwoToneIcon from "@material-ui/icons/PlayCircleFilledWhiteTwoTone";
 
 // Will be removed
 import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
@@ -15,61 +12,19 @@ import Button from "../../components/inputs/Button";
 import Slider from "../../components/inputs/Slider";
 import TimeField from "../../components/inputs/TimeField";
 
-const SCContent = styled.div`
-  padding: 20px 50px;
-`;
-
-const SCDateTitle = styled.h3`
-  color: ${(props) => props.theme.secondary};
-  font-weight: 400;
-`;
-
-const SCVideoList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-`;
-
-const SCVideoBlock = styled.div`
-  width: 200px;
-  height: 200px;
-  margin: 20px 20px 20px 0;
-  position: relative;
-  :last-child {
-    margin-right: 0;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-    object-fit: cover;
-  }
-`;
-
-const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTwoToneIcon)`
-  color: white;
-  position: absolute;
-  font-size: 60px;
-  left: calc(100px - 30px);
-  top: calc(100px - 30px);
-`;
-
-const SCPatientSelectionArea = styled.div`
-  width: 60%;
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 20px;
-  padding: 10px 0;
-  box-sizing: content-box;
-  button {
-    align-self: center;
-    margin: 0;
-  }
-`;
+import {
+  SCContent,
+  SCDateTitle,
+  SCPatientSelectionArea,
+  SCPlayCircleFilledWhiteTwoToneIcon,
+  SCVideoBlock,
+  SCVideoList,
+} from "./styles";
+import RequestLinkCard from "../../components/RequestLinkCard";
+import LinkController from "../../controllers/Link";
 
 // Will be removed
-const patients = [
+const patientsExample = [
   {
     label: "Rogério Silva",
     value: 0,
@@ -90,6 +45,22 @@ export default function MyPatients() {
   const [patientID, setPatientID] = useState(0);
   const handleOpenPlayer = () => setOpen(true);
   const handleClosePlayer = () => setOpen(false);
+
+  const [openLinkRequest, setOpenLinkRequest] = useState(false);
+  const handleOpenLinkRequest = () => setOpenLinkRequest(true);
+  const handleCloseLinkRequest = () => setOpenLinkRequest(false);
+  const [patients, setPatients] = useState(patientsExample);
+
+  const [invites, setInvites] = useState<any[]>([]);
+  useEffect(() => {
+    LinkController.getLinksAsProfessional()
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.dir(error);
+      });
+  }, []);
 
   const videoTab = (
     <SCContent>
@@ -158,11 +129,17 @@ export default function MyPatients() {
       <AppBar tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
         <SCPatientSelectionArea>
           <Select label="Paciente" options={patients} selectedValue={patientID} setSelectedValue={setPatientID} />
-          <Button color="secondary">Adicionar Paciente</Button>
+          <Button color="secondary" onClick={handleOpenLinkRequest}>
+            Adicionar Paciente
+          </Button>
         </SCPatientSelectionArea>
       </AppBar>
       <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
         <VideoPlayerCard />
+      </Dialog>
+
+      <Dialog onClose={handleCloseLinkRequest} open={openLinkRequest}>
+        <RequestLinkCard handleCloseModal={handleCloseLinkRequest} />
       </Dialog>
       {selectedTab === 0 ? videoTab : parametersTab}
     </Page>

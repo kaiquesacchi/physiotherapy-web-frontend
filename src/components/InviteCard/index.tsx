@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import LinkController from "../../controllers/Link";
 import Button from "../inputs/Button";
 
 const SCInviteCard = styled.div`
@@ -30,11 +31,22 @@ const SCButtonArea = styled.div`
   }
 `;
 
+interface iProps {
+  professionalName: string;
+  professionalToken: string;
+}
+
+// const handleAnswer = (answer) => {
+//   LinkController.answerLinkRequest({})
+// }
+
+// export default function InviteCard({ professionalName, professionalToken }: iProps) {
 export default function InviteCard() {
   return (
     <SCInviteCard>
       <h1>Convite Recebido</h1>
-      <p>O(a) Profissional Rodrigo Salles lhe enviou um convite para te registrar como seu paciente.</p>
+      {/* <p>O(a) Profissional {professionalName} lhe enviou um convite para te registrar como seu paciente.</p> */}
+      <p>O(a) Profissional lhe enviou um convite para te registrar como seu paciente.</p>
       <p className="red">SOMENTE ACEITE CONVITES DE PROFISSIONAIS RESPONSÁVEIS PELO SEU TRATAMENTO</p>
       <p>
         Ao aceitar o convite, o(a) profissional terá acesso a seus vídeos gravados durante as sessões de fisioterapia,

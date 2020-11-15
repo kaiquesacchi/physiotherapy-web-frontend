@@ -24,7 +24,7 @@ export default class AuthService {
     return HTTPService.post("/login", {
       email: email,
       password: password,
-      remember_login: false,
+      remember_login: true,
     }).then((result) => {
       AuthService._setToken(result.data.token);
       AuthService._setType(result.data.type);
@@ -37,7 +37,7 @@ export default class AuthService {
       password: password,
       name: fullName,
       cpf: cpf,
-      remember_login: false,
+      remember_login: true,
     }).then((result) => {
       AuthService._setToken(result.data.token);
     });
@@ -58,7 +58,7 @@ export default class AuthService {
       cpf: cpf,
       registration_id: registrationID,
       institution: institution,
-      remember_login: false,
+      remember_login: true,
     }).then((result) => {
       AuthService._setToken(result.data.token);
     });

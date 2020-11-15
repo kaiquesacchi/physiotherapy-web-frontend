@@ -49,7 +49,7 @@ export default function SignIn() {
         })
 
         .catch((error) => {
-          switch (error.response.status) {
+          switch (error.response?.status) {
             case 401:
               emailInputRef.current?.focus();
               setSnackBar("Email ou senha inválido.");
