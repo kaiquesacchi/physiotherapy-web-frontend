@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import LinkController from "../../controllers/Link";
 import Button from "../inputs/Button";
 
 const SCInviteCard = styled.div`
@@ -33,28 +32,40 @@ const SCButtonArea = styled.div`
 
 interface iProps {
   professionalName: string;
+  institution: string;
   professionalToken: string;
+  handleAnswer: (answer: boolean, professionalToken: string, index: number) => void;
+  index: number;
 }
 
-// const handleAnswer = (answer) => {
-//   LinkController.answerLinkRequest({})
-// }
-
-// export default function InviteCard({ professionalName, professionalToken }: iProps) {
-export default function InviteCard() {
+export default function InviteCard({ professionalName, institution, professionalToken, handleAnswer, index }: iProps) {
   return (
     <SCInviteCard>
       <h1>Convite Recebido</h1>
-      {/* <p>O(a) Profissional {professionalName} lhe enviou um convite para te registrar como seu paciente.</p> */}
-      <p>O(a) Profissional lhe enviou um convite para te registrar como seu paciente.</p>
-      <p className="red">SOMENTE ACEITE CONVITES DE PROFISSIONAIS RESPONSÁVEIS PELO SEU TRATAMENTO</p>
+      <p>
+        O(a) Profissional {professionalName}, da instituição {institution}, lhe enviou um convite para te registrar como
+        seu paciente.
+      </p>
+      <strong className="red">SOMENTE ACEITE CONVITES DE PROFISSIONAIS RESPONSÁVEIS PELO SEU TRATAMENTO</strong>
       <p>
         Ao aceitar o convite, o(a) profissional terá acesso a seus vídeos gravados durante as sessões de fisioterapia,
         bem como a estatísticas relacionadas.
       </p>
       <SCButtonArea>
-        <Button color="primary">Aceitar</Button>
-        <Button style={{ backgroundColor: "#E34949", color: "white" }}>Recusar</Button>
+        <Button
+          color="primary"
+          onClick={() => {
+            handleAnswer(true, professionalToken, index);
+          }}>
+          Aceitar
+        </Button>
+        <Button
+          style={{ backgroundColor: "#E34949", color: "white" }}
+          onClick={() => {
+            handleAnswer(false, professionalToken, index);
+          }}>
+          Recusar
+        </Button>
       </SCButtonArea>
     </SCInviteCard>
   );

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
 
-import styled from "styled-components";
-import PlayCircleFilledWhiteTwoToneIcon from "@material-ui/icons/PlayCircleFilledWhiteTwoTone";
+import { SCContent, SCDateTitle, SCPlayCircleFilledWhiteTwoToneIcon, SCVideoBlock, SCVideoList } from "./styles";
 
 // Will be removed
 import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
@@ -12,61 +11,32 @@ import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
 import InviteCard from "../../components/InviteCard";
 import LinkController from "../../controllers/Link";
-
-const SCContent = styled.div`
-  padding: 20px 50px;
-`;
-
-const SCDateTitle = styled.h3`
-  color: ${(props) => props.theme.secondary};
-  font-weight: 400;
-`;
-
-const SCVideoList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-`;
-
-const SCVideoBlock = styled.div`
-  width: 200px;
-  height: 200px;
-  margin: 20px 20px 20px 0;
-  position: relative;
-  :last-child {
-    margin-right: 0;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-    object-fit: cover;
-  }
-`;
-
-const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTwoToneIcon)`
-  color: white;
-  position: absolute;
-  font-size: 60px;
-  left: calc(100px - 30px);
-  top: calc(100px - 30px);
-`;
+import JWTService from "../../services/JWT";
+import useSnackBar from "../../components/SnackBar";
 
 export default function MyVideos() {
+  const setSnackBar = useSnackBar();
+  const [invites, setInvites] = useState<any>([]);
   const [openVideoPlayer, setOpenVideoPlayer] = useState(false);
   const handleOpenPlayer = () => setOpenVideoPlayer(true);
   const handleClosePlayer = () => setOpenVideoPlayer(false);
 
+  const handleAnswerInvite = (answer: boolean, professionalToken: string, index: number) => {
+    LinkController.answerLinkRequest(answer, professionalToken);
+    let newArray = [...invites];
+    newArray.splice(index, 1);
+    setInvites(newArray);
+  };
+
   useEffect(() => {
     LinkController.getLinkRequests()
       .then((response) => {
-        console.log(response);
+        setInvites(JWTService.decodeList(response.data));
       })
-      .catch((error) => {
-        console.dir(error);
+      .catch(() => {
+        setSnackBar("Não foi possível carregar sua lista de convites.");
       });
-  }, []);
+  }, [setSnackBar]);
   return (
     <Page>
       <AppBar>
@@ -76,7 +46,16 @@ export default function MyVideos() {
         <VideoPlayerCard />
       </Dialog>
       <SCContent>
-        <InviteCard />
+        {invites.map((invite: any, index: number) => (
+          <InviteCard
+            key={index}
+            professionalName={invite.name}
+            institution={invite.institution}
+            professionalToken={invite.token}
+            handleAnswer={handleAnswerInvite}
+            index={index}
+          />
+        ))}
         <div>
           <SCDateTitle>02/08/2020</SCDateTitle>
           <SCVideoList>

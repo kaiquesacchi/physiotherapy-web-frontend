@@ -22,40 +22,31 @@ import {
 } from "./styles";
 import RequestLinkCard from "../../components/RequestLinkCard";
 import LinkController from "../../controllers/Link";
-
-// Will be removed
-const patientsExample = [
-  {
-    label: "Rogério Silva",
-    value: 0,
-  },
-  {
-    label: "Cláudia Santos",
-    value: 1,
-  },
-  {
-    label: "Fabio Lima",
-    value: 2,
-  },
-];
+import JWTService from "../../services/JWT";
 
 export default function MyPatients() {
   const [open, setOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [patientID, setPatientID] = useState(0);
+  const [patientToken, setPatientToken] = useState(0);
   const handleOpenPlayer = () => setOpen(true);
   const handleClosePlayer = () => setOpen(false);
 
   const [openLinkRequest, setOpenLinkRequest] = useState(false);
   const handleOpenLinkRequest = () => setOpenLinkRequest(true);
   const handleCloseLinkRequest = () => setOpenLinkRequest(false);
-  const [patients, setPatients] = useState(patientsExample);
+  const [patients, setPatients] = useState<any>([]);
 
-  const [invites, setInvites] = useState<any[]>([]);
   useEffect(() => {
     LinkController.getLinksAsProfessional()
       .then((response) => {
-        console.log(response);
+        const patientList = JWTService.decodeList(response.data);
+        const formattedList = patientList.map((patient) => {
+          return {
+            label: patient.name,
+            value: patient.token,
+          };
+        });
+        setPatients(formattedList);
       })
       .catch((error) => {
         console.dir(error);
@@ -128,7 +119,7 @@ export default function MyPatients() {
     <Page>
       <AppBar tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab}>
         <SCPatientSelectionArea>
-          <Select label="Paciente" options={patients} selectedValue={patientID} setSelectedValue={setPatientID} />
+          <Select label="Paciente" options={patients} selectedValue={patientToken} setSelectedValue={setPatientToken} />
           <Button color="secondary" onClick={handleOpenLinkRequest}>
             Adicionar Paciente
           </Button>

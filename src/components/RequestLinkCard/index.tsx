@@ -46,7 +46,20 @@ export default function RequestLinkCard({ handleCloseModal }: iProps) {
         handleCloseModal();
       })
       .catch((error) => {
-        console.dir(error);
+        switch (error.response?.status) {
+          case 409:
+            setSnackBar("Você já convidou este paciente anteriormente.");
+            cpfInputRef.current?.focus();
+            return;
+          case 404:
+            setSnackBar("Nenhum usuário cadastrado com este CPF.");
+            cpfInputRef.current?.focus();
+            return;
+          default:
+            setSnackBar("Erro desconhecido. Tente novamente mais tarde.");
+            cpfInputRef.current?.focus();
+            return;
+        }
       });
   };
 

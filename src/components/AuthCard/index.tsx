@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import imageSmilingMedic from "../../assets/images/Smiling_Medic.png";
+import imageSmilingMedic from "../../assets/images/Smiling_Medic.svg";
 const SCAuthCard = styled.div`
   width: 800px;
   height: 600px;
@@ -32,8 +32,8 @@ const SCLeftArea = styled.div`
     }
   }
   img {
-    width: 100%;
-    height: auto;
+    width: 300px;
+    height: 346px;
     object-fit: contain;
   }
 `;

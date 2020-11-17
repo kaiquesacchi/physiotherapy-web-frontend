@@ -66,5 +66,7 @@ export default class AuthService {
 
   static signOut = () => {
     localStorage.removeItem(AuthService.TOKEN_KEY);
+    localStorage.removeItem(AuthService.TYPE_KEY);
+    return HTTPService.post("/logout");
   };
 }

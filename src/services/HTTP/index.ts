@@ -6,7 +6,7 @@ const checkToken = () => {
 };
 
 export default class HttpService {
-  static url = "http://localhost:5000/api/v1";
+  static url = "/api/v1";
 
   static get(path: string, config?: AxiosRequestConfig) {
     checkToken();
