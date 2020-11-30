@@ -23,18 +23,24 @@ import {
 import RequestLinkCard from "../../components/RequestLinkCard";
 import LinkController from "../../controllers/Link";
 import JWTService from "../../services/JWT";
+import VideoController from "../../controllers/Video";
+import useSnackBar from "../../components/SnackBar";
+import VideoService from "../../services/Video";
 
 export default function MyPatients() {
-  const [open, setOpen] = useState(false);
+  const setSnackBar = useSnackBar();
+  const [openVideo, setOpenVideo] = useState<any>(null); // Holds VideoID if open. Is null if closed.
   const [selectedTab, setSelectedTab] = useState(0);
-  const [patientToken, setPatientToken] = useState(0);
-  const handleOpenPlayer = () => setOpen(true);
-  const handleClosePlayer = () => setOpen(false);
-
+  const [patientToken, setPatientToken] = useState("");
   const [openLinkRequest, setOpenLinkRequest] = useState(false);
+  const [patients, setPatients] = useState<any>([]);
+  const [videos, setVideos] = useState<any>([]);
+
+  const handleOpenPlayer = (videoID: number) => setOpenVideo(videoID);
+  const handleClosePlayer = () => setOpenVideo(null);
+
   const handleOpenLinkRequest = () => setOpenLinkRequest(true);
   const handleCloseLinkRequest = () => setOpenLinkRequest(false);
-  const [patients, setPatients] = useState<any>([]);
 
   useEffect(() => {
     LinkController.getLinksAsProfessional()
@@ -47,53 +53,45 @@ export default function MyPatients() {
           };
         });
         setPatients(formattedList);
+        if (formattedList.length !== 0) {
+          setPatientToken(formattedList[0].value);
+        }
       })
       .catch((error) => {
         console.dir(error);
       });
   }, []);
 
+  useEffect(() => {
+    if (patientToken === "") return;
+    VideoController.getVideoIDsAsProfessional(patientToken)
+      .then((response) => {
+        const videoList = VideoService.parseBackendResponse(response.data);
+        setVideos(videoList);
+      })
+      .catch((error) => {
+        console.dir(error);
+        setSnackBar("Não foi possível carregar os vídeos desse paciente.");
+      });
+  }, [patientToken]);
+
   const videoTab = (
     <SCContent>
       <div>
-        <SCDateTitle>02/08/2020</SCDateTitle>
-        <SCVideoList>
-          <SCVideoBlock onClick={handleOpenPlayer}>
-            <img src={imageClosedHand} alt=""></img>
-            <SCPlayCircleFilledWhiteTwoToneIcon />
-          </SCVideoBlock>
-          <SCVideoBlock onClick={handleOpenPlayer}>
-            <img src={imageClosedHand} alt=""></img>
-            <SCPlayCircleFilledWhiteTwoToneIcon />
-          </SCVideoBlock>
-        </SCVideoList>
-      </div>
-      <div>
-        <SCDateTitle>01/08/2020</SCDateTitle>
-        <SCVideoList>
-          <SCVideoBlock>
-            <img src={imageClosedHand} alt=""></img>
-            <SCPlayCircleFilledWhiteTwoToneIcon />
-          </SCVideoBlock>
-        </SCVideoList>
-      </div>
-      <div>
-        <SCDateTitle>25/07/2020</SCDateTitle>
-        <SCVideoList>
-          <SCVideoBlock>
-            <img src={imageClosedHand} alt=""></img>
-            <SCPlayCircleFilledWhiteTwoToneIcon />
-          </SCVideoBlock>
-        </SCVideoList>
-      </div>
-      <div>
-        <SCDateTitle>22/05/2020</SCDateTitle>
-        <SCVideoList>
-          <SCVideoBlock>
-            <img src={imageClosedHand} alt=""></img>
-            <SCPlayCircleFilledWhiteTwoToneIcon />
-          </SCVideoBlock>
-        </SCVideoList>
+        {videos.map((date: any) => (
+          <React.Fragment key={date.date}>
+            <SCDateTitle>{date.date}</SCDateTitle>
+            <SCVideoList>
+              {date.videos.map((video: any) => (
+                <SCVideoBlock onClick={() => handleOpenPlayer(video.id)} key={video.id}>
+                  {video.id}
+                  <img src={imageClosedHand} alt=""></img>
+                  <SCPlayCircleFilledWhiteTwoToneIcon />
+                </SCVideoBlock>
+              ))}
+            </SCVideoList>
+          </React.Fragment>
+        ))}
       </div>
     </SCContent>
   );
@@ -125,8 +123,8 @@ export default function MyPatients() {
           </Button>
         </SCPatientSelectionArea>
       </AppBar>
-      <Dialog onClose={handleClosePlayer} open={open} maxWidth="xl">
-        <VideoPlayerCard />
+      <Dialog onClose={handleClosePlayer} open={openVideo !== null} maxWidth="xl">
+        <VideoPlayerCard videoID={openVideo} />
       </Dialog>
 
       <Dialog onClose={handleCloseLinkRequest} open={openLinkRequest}>

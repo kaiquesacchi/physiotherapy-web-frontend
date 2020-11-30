@@ -13,19 +13,27 @@ import InviteCard from "../../components/InviteCard";
 import LinkController from "../../controllers/Link";
 import JWTService from "../../services/JWT";
 import useSnackBar from "../../components/SnackBar";
+import VideoController from "../../controllers/Video";
 
 export default function MyVideos() {
   const setSnackBar = useSnackBar();
   const [invites, setInvites] = useState<any>([]);
   const [openVideoPlayer, setOpenVideoPlayer] = useState(false);
+  const [videos, setVideos] = useState<any>([]);
   const handleOpenPlayer = () => setOpenVideoPlayer(true);
   const handleClosePlayer = () => setOpenVideoPlayer(false);
 
   const handleAnswerInvite = (answer: boolean, professionalToken: string, index: number) => {
-    LinkController.answerLinkRequest(answer, professionalToken);
-    let newArray = [...invites];
-    newArray.splice(index, 1);
-    setInvites(newArray);
+    LinkController.answerLinkRequest(answer, professionalToken)
+      .then(() => {
+        let newArray = [...invites];
+        newArray.splice(index, 1);
+        setInvites(newArray);
+        setSnackBar("Resposta enviada com sucesso!");
+      })
+      .catch(() => {
+        setSnackBar("Erro desconhecido. Tente novamente mais tarde");
+      });
   };
 
   useEffect(() => {
@@ -36,7 +44,14 @@ export default function MyVideos() {
       .catch(() => {
         setSnackBar("Não foi possível carregar sua lista de convites.");
       });
+
+    VideoController.getVideoIDsAsPatient()
+      .then((response) => {})
+      .catch((e) => {
+        setSnackBar("Não foi possível carregar sua lista de vídeos.");
+      });
   }, [setSnackBar]);
+
   return (
     <Page>
       <AppBar>
