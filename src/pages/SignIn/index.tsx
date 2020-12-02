@@ -41,7 +41,7 @@ export default function SignIn() {
               history.replace("/my-videos");
               return;
             case "Professional":
-              history.replace("/patient-videos");
+              history.replace("/my-patients");
               return;
             default:
               setSnackBar("Erro inesperado. Tente novamente mais tarde.");
