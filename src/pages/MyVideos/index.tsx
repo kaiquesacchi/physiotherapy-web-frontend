@@ -1,27 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
 
-import { SCContent, SCDateTitle, SCPlayCircleFilledWhiteTwoToneIcon, SCVideoBlock, SCVideoList } from "./styles";
-
-// Will be removed
-import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
+import imageEmptyBox from "../../assets/images/Empty_Box.svg";
 
 import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
+
 import InviteCard from "../../components/InviteCard";
 import LinkController from "../../controllers/Link";
 import JWTService from "../../services/JWT";
-import useSnackBar from "../../components/SnackBar";
 import VideoController from "../../controllers/Video";
+import useSnackBar from "../../components/SnackBar";
+import VideoService from "../../services/Video";
+import {
+  SCContent,
+  SCEmptyPage,
+  SCDateTitle,
+  SCPlayCircleFilledWhiteTwoToneIcon,
+  SCVideoBlock,
+  SCVideoList,
+} from "./styles";
 
 export default function MyVideos() {
   const setSnackBar = useSnackBar();
+  const [openVideo, setOpenVideo] = useState<any>(null); // Holds VideoID if open. Is null if closed.
   const [invites, setInvites] = useState<any>([]);
-  const [openVideoPlayer, setOpenVideoPlayer] = useState(false);
   const [videos, setVideos] = useState<any>([]);
-  const handleOpenPlayer = () => setOpenVideoPlayer(true);
-  const handleClosePlayer = () => setOpenVideoPlayer(false);
+
+  const handleOpenPlayer = (videoID: number) => setOpenVideo(videoID);
+  const handleClosePlayer = () => setOpenVideo(null);
 
   const handleAnswerInvite = (answer: boolean, professionalToken: string, index: number) => {
     LinkController.answerLinkRequest(answer, professionalToken)
@@ -36,6 +44,17 @@ export default function MyVideos() {
       });
   };
 
+  const loadVideos = useCallback(() => {
+    VideoController.getVideoIDsAsPatient()
+      .then((response) => {
+        const videoList = VideoService.parseBackendResponse(response.data);
+        setVideos(videoList);
+      })
+      .catch(() => {
+        setSnackBar("Não foi possível carregar sua lista de vídeos.");
+      });
+  }, [setSnackBar]);
+
   useEffect(() => {
     LinkController.getLinkRequests()
       .then((response) => {
@@ -44,21 +63,16 @@ export default function MyVideos() {
       .catch(() => {
         setSnackBar("Não foi possível carregar sua lista de convites.");
       });
-
-    VideoController.getVideoIDsAsPatient()
-      .then((response) => {})
-      .catch((e) => {
-        setSnackBar("Não foi possível carregar sua lista de vídeos.");
-      });
-  }, [setSnackBar]);
+    loadVideos();
+  }, [setSnackBar, loadVideos]);
 
   return (
     <Page>
       <AppBar>
         <h1>Meus Vídeos</h1>
       </AppBar>
-      <Dialog onClose={handleClosePlayer} open={openVideoPlayer} maxWidth="xl">
-        <VideoPlayerCard />
+      <Dialog onClose={handleClosePlayer} open={openVideo !== null} maxWidth="xl">
+        <VideoPlayerCard videoID={openVideo} reloadVideos={loadVideos} handleClose={handleClosePlayer} />
       </Dialog>
       <SCContent>
         {invites.map((invite: any, index: number) => (
@@ -72,44 +86,30 @@ export default function MyVideos() {
           />
         ))}
         <div>
-          <SCDateTitle>02/08/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock onClick={handleOpenPlayer}>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-            <SCVideoBlock onClick={handleOpenPlayer}>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>01/08/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>25/07/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
-        </div>
-        <div>
-          <SCDateTitle>22/05/2020</SCDateTitle>
-          <SCVideoList>
-            <SCVideoBlock>
-              <img src={imageClosedHand} alt=""></img>
-              <SCPlayCircleFilledWhiteTwoToneIcon />
-            </SCVideoBlock>
-          </SCVideoList>
+          <SCContent>
+            {videos.length === 0 ? (
+              <SCEmptyPage>
+                <img src={imageEmptyBox} alt="No videos available." />
+                <p>Nenhum vídeo disponível...</p>
+              </SCEmptyPage>
+            ) : (
+              <div>
+                {videos.map((date: any) => (
+                  <React.Fragment key={date.date}>
+                    <SCDateTitle>{date.date}</SCDateTitle>
+                    <SCVideoList>
+                      {date.videos.map((video: any) => (
+                        <SCVideoBlock onClick={() => handleOpenPlayer(video.id)} key={video.id}>
+                          <img src={VideoController.getThumbnailByID(video.id)} alt=""></img>
+                          <SCPlayCircleFilledWhiteTwoToneIcon />
+                        </SCVideoBlock>
+                      ))}
+                    </SCVideoList>
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </SCContent>
         </div>
       </SCContent>
     </Page>

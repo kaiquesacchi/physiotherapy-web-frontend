@@ -6,6 +6,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import styled from "styled-components";
 import Button from "../inputs/Button";
 import VideoController from "../../controllers/Video";
+import useSnackBar from "../SnackBar";
 
 const SCVideoPlayerCard = styled.div`
   width: 800px;
@@ -25,14 +26,35 @@ const SCMenu = styled.div`
     text-align: center;
   }
 `;
+interface iProps {
+  videoID?: number;
+  reloadVideos: () => void;
+  handleClose: () => void;
+}
+export default function VideoPlayerCard({ videoID, reloadVideos, handleClose }: iProps) {
+  const setSnackBar = useSnackBar();
 
-export default function VideoPlayerCard({ videoID }: { videoID?: number }) {
+  const deleteVideo = () => {
+    VideoController.deleteVideoByID(videoID as number)
+      .then(() => {
+        setSnackBar("Vídeo removido com sucesso.");
+        reloadVideos();
+        handleClose();
+      })
+      .catch(() => {
+        setSnackBar("Não foi possível remover o vídeo. Tente novamente.");
+      });
+  };
+
   if (!videoID) return <React.Fragment />;
   return (
     <SCVideoPlayerCard>
       <ReactPlayer url={VideoController.getVideoLinkByID(videoID)} width="800px" height="600px" controls />
       <SCMenu>
-        <Button style={{ backgroundColor: "#E34949", color: "white", width: "70%" }} startIcon={<DeleteIcon />}>
+        <Button
+          style={{ backgroundColor: "#E34949", color: "white", width: "70%" }}
+          startIcon={<DeleteIcon />}
+          onClick={deleteVideo}>
           Excluir
         </Button>
       </SCMenu>

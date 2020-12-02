@@ -40,3 +40,16 @@ export const SCPlayCircleFilledWhiteTwoToneIcon = styled(PlayCircleFilledWhiteTw
   left: calc(100px - 30px);
   top: calc(100px - 30px);
 `;
+
+export const SCEmptyPage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  img {
+    width: 50%;
+  }
+  p {
+    font-size: 2.5rem;
+    color: ${(props) => props.theme.secondary};
+  }
+`;

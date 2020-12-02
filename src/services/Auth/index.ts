@@ -40,6 +40,7 @@ export default class AuthService {
       remember_login: true,
     }).then((result) => {
       AuthService._setToken(result.data.token);
+      AuthService._setType("Patient");
     });
   };
 
@@ -61,6 +62,7 @@ export default class AuthService {
       remember_login: true,
     }).then((result) => {
       AuthService._setToken(result.data.token);
+      AuthService._setType("Professional");
     });
   };
 

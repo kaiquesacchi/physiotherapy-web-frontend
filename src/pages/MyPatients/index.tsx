@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AppBar from "../../components/AppBar";
 import Page from "../../components/Page";
 
-// Will be removed
-import imageClosedHand from "../../assets/images/ClosedHand.jpeg";
+import imageEmptyBox from "../../assets/images/Empty_Box.svg";
 
 import { Dialog } from "@material-ui/core";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
@@ -19,6 +18,7 @@ import {
   SCPlayCircleFilledWhiteTwoToneIcon,
   SCVideoBlock,
   SCVideoList,
+  SCEmptyPage,
 } from "./styles";
 import RequestLinkCard from "../../components/RequestLinkCard";
 import LinkController from "../../controllers/Link";
@@ -62,8 +62,7 @@ export default function MyPatients() {
       });
   }, []);
 
-  useEffect(() => {
-    if (patientToken === "") return;
+  const loadVideos = useCallback(() => {
     VideoController.getVideoIDsAsProfessional(patientToken)
       .then((response) => {
         const videoList = VideoService.parseBackendResponse(response.data);
@@ -73,26 +72,37 @@ export default function MyPatients() {
         console.dir(error);
         setSnackBar("Não foi possível carregar os vídeos desse paciente.");
       });
-  }, [patientToken]);
+  }, [patientToken, setSnackBar]);
+
+  useEffect(() => {
+    if (patientToken === "") return;
+    loadVideos();
+  }, [patientToken, loadVideos]);
 
   const videoTab = (
     <SCContent>
-      <div>
-        {videos.map((date: any) => (
-          <React.Fragment key={date.date}>
-            <SCDateTitle>{date.date}</SCDateTitle>
-            <SCVideoList>
-              {date.videos.map((video: any) => (
-                <SCVideoBlock onClick={() => handleOpenPlayer(video.id)} key={video.id}>
-                  {video.id}
-                  <img src={imageClosedHand} alt=""></img>
-                  <SCPlayCircleFilledWhiteTwoToneIcon />
-                </SCVideoBlock>
-              ))}
-            </SCVideoList>
-          </React.Fragment>
-        ))}
-      </div>
+      {videos.length === 0 ? (
+        <SCEmptyPage>
+          <img src={imageEmptyBox} alt="No videos available." />
+          <p>Nenhum vídeo disponível...</p>
+        </SCEmptyPage>
+      ) : (
+        <div>
+          {videos.map((date: any) => (
+            <React.Fragment key={date.date}>
+              <SCDateTitle>{date.date}</SCDateTitle>
+              <SCVideoList>
+                {date.videos.map((video: any) => (
+                  <SCVideoBlock onClick={() => handleOpenPlayer(video.id)} key={video.id}>
+                    <img src={VideoController.getThumbnailByID(video.id)} alt=""></img>
+                    <SCPlayCircleFilledWhiteTwoToneIcon />
+                  </SCVideoBlock>
+                ))}
+              </SCVideoList>
+            </React.Fragment>
+          ))}
+        </div>
+      )}
     </SCContent>
   );
 
@@ -124,7 +134,7 @@ export default function MyPatients() {
         </SCPatientSelectionArea>
       </AppBar>
       <Dialog onClose={handleClosePlayer} open={openVideo !== null} maxWidth="xl">
-        <VideoPlayerCard videoID={openVideo} />
+        <VideoPlayerCard videoID={openVideo} reloadVideos={loadVideos} handleClose={handleClosePlayer} />
       </Dialog>
 
       <Dialog onClose={handleCloseLinkRequest} open={openLinkRequest}>

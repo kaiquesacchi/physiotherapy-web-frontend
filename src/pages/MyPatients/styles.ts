@@ -53,3 +53,16 @@ export const SCPatientSelectionArea = styled.div`
     margin: 0;
   }
 `;
+
+export const SCEmptyPage = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  img {
+    width: 50%;
+  }
+  p {
+    font-size: 2.5rem;
+    color: ${(props) => props.theme.secondary};
+  }
+`;
