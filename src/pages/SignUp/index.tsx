@@ -4,9 +4,9 @@ import Page from "../../components/Page";
 import TextField from "../../components/inputs/TextField";
 import Button from "../../components/inputs/Button";
 import Divider from "../../components/Divider";
-import { Step, StepLabel } from "@material-ui/core";
+import { Dialog, Step, StepLabel } from "@material-ui/core";
 
-import { SCForm, SCGreeting, SCLink, SCStepper } from "./styles";
+import { SCForm, SCGreeting, SCLink, SCStepper, SCTerms } from "./styles";
 import { useHistory } from "react-router-dom";
 import useSnackBar from "../../components/SnackBar";
 import AuthService from "../../services/Auth";
@@ -18,6 +18,8 @@ export default function SignUp() {
   const [activeStep, setActiveStep] = useState(0);
   const [isProfessional, setIsProfessional] = useState(false);
   const [stepOneInfo, setStepOneInfo] = useState({ fullName: "", email: "", password: "" });
+  const [stepTwoInfo, setStepTwoInfo] = useState({ cpf: "", registrationID: "", institution: "" });
+  const [openTerms, setOpenTerms] = useState(false);
 
   const fullNameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -57,9 +59,7 @@ export default function SignUp() {
     setActiveStep(2);
   };
 
-  const handleSignUp = (e: FormEvent) => {
-    e.preventDefault();
-    const { fullName, email, password } = stepOneInfo;
+  const validateSecondStep = () => {
     const cpf = cpfInputRef.current?.value || "";
 
     if (cpf.length !== 11) {
@@ -68,7 +68,6 @@ export default function SignUp() {
       return;
     }
 
-    let promise;
     if (isProfessional) {
       const registrationID = registrationIDInputRef.current?.value || "";
       const institution = institutionInputRef.current?.value || "";
@@ -83,16 +82,30 @@ export default function SignUp() {
         institutionInputRef.current?.focus();
         return;
       }
+      setStepTwoInfo({ cpf: cpf, registrationID: registrationID, institution: institution });
+    } else setStepTwoInfo({ cpf: cpf, registrationID: "", institution: "" });
+    setOpenTerms(true);
+  };
 
+  const handleSignUp = (e: FormEvent) => {
+    e.preventDefault();
+    const { fullName, email, password } = stepOneInfo;
+    const { cpf, registrationID, institution } = stepTwoInfo;
+
+    let promise;
+    if (isProfessional) {
       promise = AuthService.signUpProfessional(email, password, fullName, cpf, registrationID, institution);
     } else {
       promise = AuthService.signUpPatient(email, password, fullName, cpf);
     }
+
     promise
       .then(() => {
         history.replace(isProfessional ? "/my-patients" : "my-videos");
       })
-      .catch((error) => {});
+      .catch((error) => {
+        setSnackBar("Não foi possível criar a conta. Tente novamente mais tarde.");
+      });
   };
 
   const handleChooseUserType = (isProfessional: boolean) => {
@@ -127,7 +140,7 @@ export default function SignUp() {
           </Step>
         ))}
       </SCStepper>
-      <SCForm onSubmit={handleSignUp}>
+      <SCForm>
         {
           /* First Step of the Form */
           activeStep === 1 && (
@@ -161,10 +174,28 @@ export default function SignUp() {
                   ""
                 )}
               </div>
-              <Button color="secondary" type="submit">
+              <Button color="secondary" onClick={validateSecondStep}>
                 Criar Conta
               </Button>
               <Button onClick={() => setActiveStep(1)}>Voltar</Button>
+              <Dialog onClose={() => setOpenTerms(false)} open={openTerms} maxWidth="sm">
+                <SCTerms>
+                  <h1>Termos de uso</h1>
+                  <p>Ao confirmar seu cadastro, você se certifica de que todos os dados fornecidos estão corretos.</p>
+                  <p>
+                    Os dados coletados e mantidos pela plataforma só podem ser utilizados por aqueles que possuem acesso
+                    legal, ou seja, o paciente e seus profissionais responsáveis.
+                  </p>
+                  <p>
+                    O uso indevido da plataforma é de responsabilidade do infrator, e resultará na tomada de medidas
+                    cabíveis.
+                  </p>
+                  <Button color="primary" type="submit" onClick={handleSignUp}>
+                    Aceito
+                  </Button>
+                  <Button onClick={() => setOpenTerms(false)}>Não aceito</Button>
+                </SCTerms>
+              </Dialog>
             </React.Fragment>
           )
         }

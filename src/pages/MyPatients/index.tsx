@@ -1,16 +1,26 @@
 import React, { useCallback, useEffect, useState } from "react";
-import AppBar from "../../components/AppBar";
-import Page from "../../components/Page";
-
+import useSnackBar from "../../components/SnackBar";
 import imageEmptyBox from "../../assets/images/Empty_Box.svg";
 
-import { Dialog } from "@material-ui/core";
+// Components.
+import { Dialog, Slider } from "@material-ui/core";
+import AppBar from "../../components/AppBar";
+import Page from "../../components/Page";
 import VideoPlayerCard from "../../components/VideoPlayerCard";
 import Select from "../../components/inputs/Select";
 import Button from "../../components/inputs/Button";
-import Slider from "../../components/inputs/Slider";
-import TimeField from "../../components/inputs/TimeField";
+import RequestLinkCard from "../../components/RequestLinkCard";
 
+// Controllers.
+import LinkController from "../../controllers/Link";
+import VideoController from "../../controllers/Video";
+import ParametersController from "../../controllers/Parameters";
+
+// Services.
+import JWTService from "../../services/JWT";
+import VideoService from "../../services/Video";
+
+// Styled Components.
 import {
   SCContent,
   SCDateTitle,
@@ -19,29 +29,36 @@ import {
   SCVideoBlock,
   SCVideoList,
   SCEmptyPage,
+  SCParametersTab,
 } from "./styles";
-import RequestLinkCard from "../../components/RequestLinkCard";
-import LinkController from "../../controllers/Link";
-import JWTService from "../../services/JWT";
-import VideoController from "../../controllers/Video";
-import useSnackBar from "../../components/SnackBar";
-import VideoService from "../../services/Video";
 
 export default function MyPatients() {
   const setSnackBar = useSnackBar();
-  const [openVideo, setOpenVideo] = useState<any>(null); // Holds VideoID if open. Is null if closed.
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [patientToken, setPatientToken] = useState("");
-  const [openLinkRequest, setOpenLinkRequest] = useState(false);
-  const [patients, setPatients] = useState<any>([]);
-  const [videos, setVideos] = useState<any>([]);
 
+  // State.
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [patients, setPatients] = useState<any>([]);
+  const [patientToken, setPatientToken] = useState("");
+  const [videos, setVideos] = useState<any>([]);
+  const [openLinkRequest, setOpenLinkRequest] = useState(false);
+  const [openVideo, setOpenVideo] = useState<any>(null); // Holds VideoID if open. Is null if closed.
+  const [parameters, setParameters] = useState({ difficulty: 50, velocity: 50 });
+
+  // Handlers.
   const handleOpenPlayer = (videoID: number) => setOpenVideo(videoID);
   const handleClosePlayer = () => setOpenVideo(null);
 
   const handleOpenLinkRequest = () => setOpenLinkRequest(true);
   const handleCloseLinkRequest = () => setOpenLinkRequest(false);
 
+  const handleSliderDifficulty = (event: React.ChangeEvent<{}>, newValue: number | number[]) => {
+    setParameters({ ...parameters, difficulty: newValue as number });
+  };
+  const handleSliderVelocity = (event: React.ChangeEvent<{}>, newValue: number | number[]) => {
+    setParameters({ ...parameters, velocity: newValue as number });
+  };
+
+  /* Loads list of linked Patients. */
   useEffect(() => {
     LinkController.getLinksAsProfessional()
       .then((response) => {
@@ -58,10 +75,11 @@ export default function MyPatients() {
         }
       })
       .catch((error) => {
-        console.dir(error);
+        setSnackBar("Não foi possível carregar sua lista de pacientes.");
       });
-  }, []);
+  }, [setSnackBar]);
 
+  /* Loads Patient data. */
   const loadVideos = useCallback(() => {
     VideoController.getVideoIDsAsProfessional(patientToken)
       .then((response) => {
@@ -69,15 +87,50 @@ export default function MyPatients() {
         setVideos(videoList);
       })
       .catch((error) => {
-        console.dir(error);
         setSnackBar("Não foi possível carregar os vídeos desse paciente.");
+      });
+  }, [patientToken, setSnackBar]);
+
+  const loadParameters = useCallback(() => {
+    ParametersController.getPatientParameters(patientToken)
+      .then((response: any) => {
+        const responseObject = JSON.parse(response.data);
+        if (!("difficulty" in responseObject) || !("velocity" in responseObject)) {
+          setParameters({ difficulty: 50, velocity: 50 });
+          return;
+        }
+        setParameters({
+          difficulty: responseObject.difficulty,
+          velocity: responseObject.velocity,
+        });
+      })
+      .catch(() => {
+        setSnackBar("Não foi possível carregar os parâmetros de sessão do paciente.");
       });
   }, [patientToken, setSnackBar]);
 
   useEffect(() => {
     if (patientToken === "") return;
     loadVideos();
-  }, [patientToken, loadVideos]);
+    loadParameters();
+  }, [patientToken, loadVideos, loadParameters]);
+
+  /* Saves parameters */
+  const sendParameters = () => {
+    if (patientToken === "") {
+      setSnackBar("Nenhum paciente selecionado. As mudanças não terão efeito.");
+    }
+    ParametersController.setPatientParameters(patientToken, {
+      difficulty: parameters.difficulty,
+      velocity: parameters.velocity,
+    })
+      .then(() => {
+        setSnackBar("Parâmetros atualizados com sucesso!");
+      })
+      .catch(() => {
+        setSnackBar("Não foi possível atualizar os parâmetros.");
+      });
+  };
 
   const videoTab = (
     <SCContent>
@@ -108,18 +161,35 @@ export default function MyPatients() {
 
   const parametersTab = (
     <SCContent>
-      <div>
-        <SCDateTitle>Limiar de Detecção</SCDateTitle>
-        <Slider />
-      </div>
-      <div>
-        <SCDateTitle>Tempo Máximo por Sessão</SCDateTitle>
-        <TimeField />
-      </div>
-      <div>
-        <SCDateTitle>Intervalo Mínimo entre Sessões</SCDateTitle>
-        <TimeField />
-      </div>
+      <SCParametersTab>
+        <h1>Space Shooter</h1>
+        <div>
+          <h3>Dificuldade</h3>
+          <Slider
+            valueLabelDisplay="auto"
+            marks
+            step={5}
+            min={0}
+            max={100}
+            value={parameters.difficulty || 0}
+            onChange={handleSliderDifficulty}
+            onChangeCommitted={sendParameters}
+          />
+        </div>
+        <div>
+          <h3>Velocidade do Jogador</h3>
+          <Slider
+            valueLabelDisplay="auto"
+            marks
+            step={5}
+            min={0}
+            max={100}
+            value={parameters.velocity || 0}
+            onChange={handleSliderVelocity}
+            onChangeCommitted={sendParameters}
+          />
+        </div>
+      </SCParametersTab>
     </SCContent>
   );
 

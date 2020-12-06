@@ -24,3 +24,11 @@ export const SCStepper = styled(Stepper)`
   padding: 0;
   width: 90%;
 `;
+
+export const SCTerms = styled.div`
+  padding: 30px;
+  p {
+    font-size: 1.5rem;
+    margin-top: 10px;
+  }
+`;

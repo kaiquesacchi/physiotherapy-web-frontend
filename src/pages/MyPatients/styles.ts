@@ -66,3 +66,14 @@ export const SCEmptyPage = styled.div`
     color: ${(props) => props.theme.secondary};
   }
 `;
+
+export const SCParametersTab = styled.div`
+  color: ${(props) => props.theme.secondary};
+  font-weight: 400;
+  h1 {
+    margin-bottom: 50px;
+  }
+  h3 {
+    margin-top: 20px;
+  }
+`;
